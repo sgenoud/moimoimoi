@@ -8,7 +8,7 @@ Vite-powered vanilla frontend with a minimal PWA setup.
 - `npm run dev`
 - `npm run build`
 - `npm run preview`
-- `npm run generate:ios-splash` — regenerate iOS splash screens and touch icons.
+- `npm run generate:ios-splash` — regenerate the full iOS splash screen set and touch icons.
 
 ## iOS splash generation
 

@@ -13,7 +13,7 @@ Use npm with Vite:
 - `npm run dev` — start the local dev server.
 - `npm run build` — build for production into `dist/`.
 - `npm run preview` — serve the production build locally.
-- `npm run generate:ios-splash` — regenerate iOS splash screens and touch icons (requires `rsvg-convert` and `magick`).
+- `npm run generate:ios-splash` — regenerate the full iOS splash screen set and touch icons (requires `rsvg-convert` and `magick`).
 
 ## Coding Style & Naming Conventions
 Formatting is handled by Prettier (add it if missing in your environment).
