@@ -13,7 +13,7 @@ const progressBottom = document.querySelector('#progressBottom');
 const progressLeft = document.querySelector('#progressLeft');
 
 const touches = new Map();
-const COUNTDOWN_MS = 3000;
+const COUNTDOWN_MS = 2500;
 const COLORS = ['#00f2a5', '#35a7ff', '#ffb84d', '#ff6b6b', '#a855f7', '#f97316'];
 const availableColors = [...COLORS];
 
