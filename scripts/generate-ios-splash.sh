@@ -10,6 +10,10 @@ magick /tmp/icon-1024.png -resize 167x167 public/apple-touch-icon-167.png
 magick /tmp/icon-1024.png -resize 152x152 public/apple-touch-icon-152.png
 magick /tmp/icon-1024.png -resize 120x120 public/apple-touch-icon-120.png
 
+# PWA manifest icons (PNG).
+magick /tmp/icon-1024.png -resize 192x192 public/icon-192.png
+magick /tmp/icon-1024.png -resize 512x512 public/icon-512.png
+
 # Splash logo used on iOS startup images.
 magick /tmp/icon-1024.png -resize 512x512 /tmp/ios-splash-logo.png
 
