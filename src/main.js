@@ -24,6 +24,7 @@ const COLORS = [
 ];
 const availableColors = [...COLORS];
 
+const APP_VERSION = "4.1";
 const SUPPORTED_LANGS = ["fr", "en", "de", "it", "es"];
 const MESSAGES = {
   fr: {
@@ -86,6 +87,11 @@ const secondsFormatter = new Intl.NumberFormat(currentLang, {
 });
 document.documentElement.lang = currentLang;
 
+const versionBadge = document.createElement("div");
+versionBadge.className = "version-badge";
+versionBadge.textContent = APP_VERSION;
+document.body.appendChild(versionBadge);
+
 const isTouchLike = (event) =>
   event.pointerType === "touch" || event.pointerType === "pen";
 
@@ -98,8 +104,8 @@ const createDot = (color) => {
 };
 
 const updateDotPosition = (dot, x, y) => {
-  dot.style.setProperty('--touch-x', `${x}px`);
-  dot.style.setProperty('--touch-y', `${y}px`);
+  dot.style.setProperty("--touch-x", `${x}px`);
+  dot.style.setProperty("--touch-y", `${y}px`);
 };
 
 const clearSelection = () => {

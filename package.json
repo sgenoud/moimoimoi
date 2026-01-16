@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "generate:ios-splash": "sh scripts/generate-ios-splash.sh"
+    "generate:ios-splash": "sh scripts/generate-ios-splash.sh",
+    "bump:version": "sh scripts/bump-version.sh"
   },
   "devDependencies": {
     "prettier": "^3.8.0",

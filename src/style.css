@@ -40,6 +40,18 @@ body.winner-mode {
   --muted: rgba(0, 0, 0, 0.7);
 }
 
+.version-badge {
+  position: fixed;
+  right: 12px;
+  bottom: 10px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  opacity: 0.2;
+  pointer-events: none;
+  z-index: 5;
+}
+
 #app {
   position: relative;
   width: 100%;
