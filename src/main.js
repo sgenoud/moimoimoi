@@ -98,13 +98,16 @@ const createDot = (color) => {
 };
 
 const updateDotPosition = (dot, x, y) => {
-  dot.style.left = `${x}px`;
-  dot.style.top = `${y}px`;
+  dot.style.setProperty('--touch-x', `${x}px`);
+  dot.style.setProperty('--touch-y', `${y}px`);
 };
 
 const clearSelection = () => {
   selectedId = null;
   touches.forEach((touch) => touch.el.classList.remove("touch-dot--winner"));
+  document.querySelectorAll(".touch-dot--winner").forEach((el) => {
+    el.classList.remove("touch-dot--winner");
+  });
   document.body.classList.remove("winner-mode");
 };
 
@@ -203,6 +206,9 @@ const onPointerDown = (event) => {
     return;
   }
   event.preventDefault();
+  if (touches.has(event.pointerId)) {
+    return;
+  }
   const color =
     availableColors.length > 0 ? availableColors.shift() : COLORS[0];
   const dot = createDot(color);
