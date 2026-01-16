@@ -17,10 +17,67 @@ const COUNTDOWN_MS = 2500;
 const COLORS = ['#00f2a5', '#35a7ff', '#ffb84d', '#ff6b6b', '#a855f7', '#f97316'];
 const availableColors = [...COLORS];
 
+const SUPPORTED_LANGS = ['fr', 'en', 'de', 'it', 'es'];
+const MESSAGES = {
+  fr: {
+    promptTouch: "Posez un doigt sur l'écran.",
+    chosen: 'Choisi. Relevez pour rejouer.',
+    countdown: 'Compte à rebours: {seconds}s',
+  },
+  en: {
+    promptTouch: 'Place a finger on the screen.',
+    chosen: 'Chosen. Lift to play again.',
+    countdown: 'Countdown: {seconds}s',
+  },
+  de: {
+    promptTouch: 'Lege einen Finger auf den Bildschirm.',
+    chosen: 'Gewählt. Zum erneuten Spielen loslassen.',
+    countdown: 'Countdown: {seconds}s',
+  },
+  it: {
+    promptTouch: 'Appoggia un dito sullo schermo.',
+    chosen: 'Scelto. Solleva per rigiocare.',
+    countdown: 'Conto alla rovescia: {seconds}s',
+  },
+  es: {
+    promptTouch: 'Pon un dedo en la pantalla.',
+    chosen: 'Elegido. Suelta para jugar de nuevo.',
+    countdown: 'Cuenta regresiva: {seconds}s',
+  },
+};
+
 let countdownStart = null;
 let selectedId = null;
 let lastCount = 0;
 let countdownLabel = '';
+
+const normalizeLanguage = (value) => {
+  if (!value) {
+    return null;
+  }
+  return value.toLowerCase().split('-')[0];
+};
+
+const getPreferredLanguage = () => {
+  const params = new URLSearchParams(window.location.search);
+  const queryLang = normalizeLanguage(params.get('lang'));
+  if (queryLang && SUPPORTED_LANGS.includes(queryLang)) {
+    return queryLang;
+  }
+  const browserLang = normalizeLanguage(navigator.language);
+  if (browserLang && SUPPORTED_LANGS.includes(browserLang)) {
+    return browserLang;
+  }
+  return 'fr';
+};
+
+const currentLang = getPreferredLanguage();
+const currentMessages = MESSAGES[currentLang] || MESSAGES.fr;
+const secondsFormatter = new Intl.NumberFormat(currentLang, {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+});
+document.documentElement.lang = currentLang;
 
 const isTouchLike = (event) => event.pointerType === 'touch' || event.pointerType === 'pen';
 
@@ -80,9 +137,9 @@ const chooseWinner = () => {
 };
 
 const updatePrompt = () => {
-  let text = "Posez un doigt sur l'écran.";
+  let text = currentMessages.promptTouch;
   if (selectedId) {
-    text = 'Choisi. Relevez pour rejouer.';
+    text = currentMessages.chosen;
   } else if (countdownLabel) {
     text = countdownLabel;
   } 
@@ -120,7 +177,8 @@ const updateCountdown = (now) => {
   const remaining = Math.max(0, COUNTDOWN_MS - elapsed);
   const progress = 1 - remaining / COUNTDOWN_MS;
 
-  countdownLabel = `Compte à rebours: ${(remaining / 1000).toFixed(1)}s`;
+  const seconds = secondsFormatter.format(remaining / 1000);
+  countdownLabel = currentMessages.countdown.replace('{seconds}', seconds);
   const fillValue = Math.max(0, 1 - progress);
   progressTop.style.transform = `scaleX(${fillValue})`;
   progressBottom.style.transform = `scaleX(${fillValue})`;
