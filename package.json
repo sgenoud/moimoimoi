@@ -10,6 +10,7 @@
     "generate:ios-splash": "sh scripts/generate-ios-splash.sh"
   },
   "devDependencies": {
+    "prettier": "^3.8.0",
     "vite": "^5.4.0"
   }
 }
