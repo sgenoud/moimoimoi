@@ -41,6 +41,23 @@ body.winner-mode {
   --muted: rgba(0, 0, 0, 0.7);
 }
 
+.debug-panel {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  max-width: 80vw;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre;
+  pointer-events: none;
+}
+
 .version-badge {
   position: fixed;
   right: 12px;

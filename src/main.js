@@ -24,7 +24,7 @@ const COLORS = [
 ];
 const availableColors = [...COLORS];
 
-const APP_VERSION = "4.2";
+const APP_VERSION = "4.3";
 const SUPPORTED_LANGS = ["fr", "en", "de", "it", "es"];
 const MESSAGES = {
   fr: {
@@ -83,6 +83,8 @@ const getPreferredLanguage = () => {
 
 const currentLang = getPreferredLanguage();
 const currentMessages = MESSAGES[currentLang] || MESSAGES.fr;
+const debugEnabled =
+  new URLSearchParams(window.location.search).get("debug") === "true";
 const secondsFormatter = new Intl.NumberFormat(currentLang, {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
@@ -93,6 +95,12 @@ const versionBadge = document.createElement("div");
 versionBadge.className = "version-badge";
 versionBadge.textContent = APP_VERSION;
 document.body.appendChild(versionBadge);
+
+const debugPanel = document.createElement("div");
+debugPanel.className = "debug-panel";
+debugPanel.setAttribute("aria-hidden", "true");
+debugPanel.style.display = debugEnabled ? "block" : "none";
+document.body.appendChild(debugPanel);
 
 const isTouchLike = (event) =>
   event.pointerType === "touch" || event.pointerType === "pen";
@@ -182,7 +190,7 @@ const setState = (nextState, options = {}) => {
     countdownLabel = "";
     resetProgress();
     const chosen = touches.get(options.id);
-    if (!chosen) {
+    if (!chosen && chosen !== 0) {
       setState("idle", { clearTouches: touches.size === 0 });
       return;
     }
@@ -242,6 +250,23 @@ const updatePrompt = () => {
       el.textContent = text;
     }
   });
+};
+
+const updateDebugPanel = () => {
+  if (!debugEnabled) {
+    return;
+  }
+  const lines = [`State: ${currentState}`, `Winner: ${selectedId ?? "none"}`];
+  if (touches.size === 0) {
+    lines.push("Touches: none");
+    debugPanel.textContent = lines.join("\n");
+    return;
+  }
+  lines.push("Touches:");
+  touches.forEach((touch, id) => {
+    lines.push(`- id ${id}: ${Math.round(touch.x)}, ${Math.round(touch.y)}`);
+  });
+  debugPanel.textContent = lines.join("\n");
 };
 
 const updateCountdown = (now) => {
@@ -326,6 +351,7 @@ window.addEventListener("dragstart", (event) => event.preventDefault());
 const loop = (now) => {
   updateCountdown(now);
   updatePrompt();
+  updateDebugPanel();
   requestAnimationFrame(loop);
 };
 
