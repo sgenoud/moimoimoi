@@ -24,7 +24,7 @@ const COLORS = [
 ];
 const availableColors = [...COLORS];
 
-const APP_VERSION = "4.1";
+const APP_VERSION = "4.2beta2";
 const SUPPORTED_LANGS = ["fr", "en", "de", "it", "es"];
 const MESSAGES = {
   fr: {
@@ -58,6 +58,8 @@ let countdownStart = null;
 let selectedId = null;
 let lastCount = 0;
 let countdownLabel = "";
+let currentState = "idle";
+let countdownTimer = null;
 
 const normalizeLanguage = (value) => {
   if (!value) {
@@ -108,6 +110,13 @@ const updateDotPosition = (dot, x, y) => {
   dot.style.setProperty("--touch-y", `${y}px`);
 };
 
+const clearAllTouches = () => {
+  document.querySelectorAll(".touch-dot").forEach((el) => el.remove());
+  touches.clear();
+  availableColors.length = 0;
+  availableColors.push(...COLORS);
+};
+
 const clearSelection = () => {
   selectedId = null;
   touches.forEach((touch) => touch.el.classList.remove("touch-dot--winner"));
@@ -117,34 +126,67 @@ const clearSelection = () => {
   document.body.classList.remove("winner-mode");
 };
 
-const startCountdown = () => {
-  if (touches.size < 2) {
-    countdownStart = null;
-    return;
-  }
-  countdownStart = performance.now();
+const resetProgress = () => {
+  progressTop.style.transform = "scaleX(0)";
+  progressBottom.style.transform = "scaleX(0)";
+  progressRight.style.transform = "scaleY(0)";
+  progressLeft.style.transform = "scaleY(0)";
 };
 
-const handleCountChange = () => {
-  if (touches.size !== lastCount) {
-    lastCount = touches.size;
-    if (selectedId && touches.size > 0) {
-      return;
+const setState = (nextState, options = {}) => {
+  if (currentState === nextState && !options.force) {
+    return;
+  }
+  currentState = nextState;
+
+  if (countdownTimer) {
+    clearTimeout(countdownTimer);
+    countdownTimer = null;
+  }
+
+  if (currentState === "idle") {
+    countdownStart = null;
+    countdownLabel = "";
+    if (options.clearTouches) {
+      clearAllTouches();
     }
     clearSelection();
-    startCountdown();
-  }
-};
-
-const chooseWinner = () => {
-  const ids = Array.from(touches.keys());
-  if (ids.length === 0) {
+    resetProgress();
     return;
   }
-  const choiceIndex = Math.floor(Math.random() * ids.length);
-  selectedId = ids[choiceIndex];
-  const chosen = touches.get(selectedId);
-  if (chosen) {
+
+  if (currentState === "countdown") {
+    countdownLabel = "";
+    clearSelection();
+    countdownStart = options.now ?? performance.now();
+    const startAt = countdownStart;
+    countdownTimer = window.setTimeout(() => {
+      if (currentState !== "countdown") {
+        return;
+      }
+      if (touches.size < 2 || countdownStart !== startAt) {
+        return;
+      }
+      const winnerId = chooseWinnerId();
+      if (winnerId) {
+        setState("winner", { id: winnerId });
+      } else {
+        setState("idle");
+      }
+    }, COUNTDOWN_MS);
+    return;
+  }
+
+  if (currentState === "winner") {
+    countdownStart = null;
+    countdownLabel = "";
+    resetProgress();
+    const chosen = touches.get(options.id);
+    if (!chosen) {
+      setState("idle", { clearTouches: touches.size === 0 });
+      return;
+    }
+    selectedId = options.id;
     chosen.el.classList.add("touch-dot--winner");
     chosen.el.classList.add("is-zooming");
     document.documentElement.style.setProperty("--winner-color", chosen.color);
@@ -153,11 +195,46 @@ const chooseWinner = () => {
   }
 };
 
+const chooseWinnerId = () => {
+  const ids = Array.from(touches.keys());
+  if (ids.length === 0) {
+    return null;
+  }
+  const choiceIndex = Math.floor(Math.random() * ids.length);
+  return ids[choiceIndex];
+};
+
+const handleCountChange = (now = performance.now()) => {
+  if (touches.size === lastCount) {
+    return;
+  }
+  lastCount = touches.size;
+
+  if (currentState === "winner") {
+    if (touches.size === 0) {
+      setState("idle", { clearTouches: true });
+    }
+    return;
+  }
+
+  if (touches.size < 2) {
+    setState("idle");
+    return;
+  }
+
+  if (currentState === "countdown") {
+    setState("countdown", { now, force: true });
+    return;
+  }
+
+  setState("countdown", { now });
+};
+
 const updatePrompt = () => {
   let text = currentMessages.promptTouch;
-  if (selectedId) {
+  if (currentState === "winner") {
     text = currentMessages.chosen;
-  } else if (countdownLabel) {
+  } else if (currentState === "countdown" && countdownLabel) {
     text = countdownLabel;
   }
   promptEls.forEach((el) => {
@@ -168,26 +245,11 @@ const updatePrompt = () => {
 };
 
 const updateCountdown = (now) => {
-  if (touches.size < 2) {
-    progressTop.style.transform = "scaleX(0)";
-    progressBottom.style.transform = "scaleX(0)";
-    progressRight.style.transform = "scaleY(0)";
-    progressLeft.style.transform = "scaleY(0)";
-    countdownLabel = "";
+  if (currentState !== "countdown") {
     return;
   }
-
   if (!countdownStart) {
     countdownStart = now;
-  }
-
-  if (selectedId) {
-    progressTop.style.transform = "scaleX(0)";
-    progressBottom.style.transform = "scaleX(0)";
-    progressRight.style.transform = "scaleY(0)";
-    progressLeft.style.transform = "scaleY(0)";
-    countdownLabel = "";
-    return;
   }
 
   const elapsed = now - countdownStart;
@@ -201,10 +263,6 @@ const updateCountdown = (now) => {
   progressBottom.style.transform = `scaleX(${fillValue})`;
   progressRight.style.transform = `scaleY(${fillValue})`;
   progressLeft.style.transform = `scaleY(${fillValue})`;
-
-  if (remaining <= 0) {
-    chooseWinner();
-  }
 };
 
 const onPointerDown = (event) => {
