@@ -1,4 +1,4 @@
-const CACHE_NAME = "moimoimoi-runtime-v4.2beta2";
+const CACHE_NAME = "moimoimoi-runtime-v4.2";
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
