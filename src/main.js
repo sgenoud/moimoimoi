@@ -24,7 +24,7 @@ const COLORS = [
 ];
 const availableColors = [...COLORS];
 
-const APP_VERSION = "4.4";
+const APP_VERSION = "4.5";
 const SUPPORTED_LANGS = ["fr", "en", "de", "it", "es"];
 const MESSAGES = {
   fr: {
@@ -256,7 +256,11 @@ const updateDebugPanel = () => {
   if (!debugEnabled) {
     return;
   }
-  const lines = [`State: ${currentState}`, `Winner: ${selectedId ?? "none"}`];
+  const lines = [
+    `Version: ${APP_VERSION}`,
+    `State: ${currentState}`,
+    `Winner: ${selectedId ?? "none"}`,
+  ];
   if (touches.size === 0) {
     lines.push("Touches: none");
     debugPanel.textContent = lines.join("\n");
