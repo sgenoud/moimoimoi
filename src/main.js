@@ -24,7 +24,7 @@ const COLORS = [
 ];
 const availableColors = [...COLORS];
 
-const APP_VERSION = "4.3";
+const APP_VERSION = "4.4";
 const SUPPORTED_LANGS = ["fr", "en", "de", "it", "es"];
 const MESSAGES = {
   fr: {
@@ -176,7 +176,7 @@ const setState = (nextState, options = {}) => {
         return;
       }
       const winnerId = chooseWinnerId();
-      if (winnerId) {
+      if (winnerId || winnerId === 0) {
         setState("winner", { id: winnerId });
       } else {
         setState("idle");
