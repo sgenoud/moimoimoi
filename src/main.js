@@ -21,6 +21,10 @@ const COLORS = [
   "#ff6b6b",
   "#a855f7",
   "#f97316",
+  "#22d3ee",
+  "#facc15",
+  "#14f195",
+  "#e11d48",
 ];
 const availableColors = [...COLORS];
 
@@ -85,6 +89,9 @@ const currentLang = getPreferredLanguage();
 const currentMessages = MESSAGES[currentLang] || MESSAGES.fr;
 const debugEnabled =
   new URLSearchParams(window.location.search).get("debug") === "true";
+const soloEnabled =
+  new URLSearchParams(window.location.search).get("solo") === "true";
+const minTouchCount = soloEnabled ? 1 : 2;
 const secondsFormatter = new Intl.NumberFormat(currentLang, {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
@@ -172,7 +179,7 @@ const setState = (nextState, options = {}) => {
       if (currentState !== "countdown") {
         return;
       }
-      if (touches.size < 2 || countdownStart !== startAt) {
+      if (touches.size < minTouchCount || countdownStart !== startAt) {
         return;
       }
       const winnerId = chooseWinnerId();
@@ -225,7 +232,7 @@ const handleCountChange = (now = performance.now()) => {
     return;
   }
 
-  if (touches.size < 2) {
+  if (touches.size < minTouchCount) {
     setState("idle");
     return;
   }
