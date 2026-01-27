@@ -28,7 +28,7 @@ const COLORS = [
 ];
 const availableColors = [...COLORS];
 
-const APP_VERSION = "4.5";
+const APP_VERSION = "4.6";
 const SUPPORTED_LANGS = ["fr", "en", "de", "it", "es"];
 const MESSAGES = {
   fr: {
